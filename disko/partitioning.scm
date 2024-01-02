@@ -9,6 +9,9 @@
 	    part-disk))
 
 (define (gnu-parted disk script)
+  (display "parted --script --align=optimal \"")
+  (display disk)
+  (display "\" -- ")
   (display (string-join script))
   (newline))
 

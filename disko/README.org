@@ -4,3 +4,12 @@
 * Disclaimer
 
 Development in progress. Inspired by nix-community's disko flake
+
+* Roadmap
+
+1. [ ] Root directory is hardcoded (=/mnt=). Get it from CLI, then put to ENV and take in procedures with =getenv= like =INSTALLATION_ROOT= env variable
+2. [ ] Priority
+   : Translated with DeepL
+   If you put the vfat partition in front of the root partition,
+   disko will try to mount the vfat partition in /mnt/boot/efi,
+   which does not exist because it is mounted in front of the root partition.
