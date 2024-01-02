@@ -1,0 +1,22 @@
+#!/usr/bin/env -S GUILE_LOAD_PATH=${HOME}/.config/guix/current/share/guile/site/3.0/:${GUILE_LOAD_PATH} guix repl --
+!#
+;; SPDX-License-Identifier: GPL-3.0-or-later
+;; Copyright © 2023 Dmitry Klementiev
+
+(use-modules
+ (gnu system)
+ (guix monads))
+
+(define (install-operating-system os target)
+  (let ((bootloader (operating-system-bootloader os))
+	(bootcfg (operating-system-bootcfg os))
+	(os-drv (operating-system-derivation os)))
+    ((@@ (guix scripts system) install)
+     os-drv target
+     #:install-bootloader? #t
+     #:bootloader bootloader
+     #:bootcfg bootcfg)))
+
+;; Local Variables:
+;; mode: scheme
+;; End:
