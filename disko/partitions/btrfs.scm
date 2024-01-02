@@ -1,4 +1,5 @@
 (define-module (disko partitions btrfs)
+  #:use-module (gnu system file-systems)
   #:use-module (guix records)
   #:use-module (disko utils)
   #:use-module (ice-9 match)
@@ -22,7 +23,8 @@
 	    btrfs-swapfile-path
 	    btrfs-swapfile-size
 
-	    make-btrfs-partition))
+	    make-btrfs-partition
+	    btrfs-partition->file-systems))
 
 (define-record-type* <btrfs-partition>
   btrfs-partition
@@ -77,7 +79,37 @@
 				      (string-append
 				       partition-mount-point path))))
 	  (newline)
+	  (display (string-join (list "mkdir" "-p"
+				      (string-append "/mnt" mount-point))))
+	  (newline)
+	  (display (string-join (list "mount" "-o"
+				      (string-append "subvolume=" (basename path))
+				      (string-append "/mnt" mount-point))))
+	  (newline)
 	  )))
      subvolumes)
-    ;; TODO: Swapfiles
+
+    (for-each
+     (lambda (swapfile)
+       (display (string-join (list "btrfs" "filesystem" "mkswapfile"
+				   "--size" (btrfs-swapfile-size swapfile)
+				   (string-append "/mnt"
+						  (btrfs-swapfile-path swapfile)))))
+       (newline))
+     swapfiles)
     ))
+
+(define* (btrfs-partition->file-systems device partition
+					#:key
+					(root (or (getenv "INSTALLATION_ROOT")
+						  "/mnt")))
+  (map
+   (lambda (subvolume)
+     (file-system
+      (mount-point (btrfs-subvolume-mount-point subvolume))
+      (device device)
+      (type "btrfs")
+      (options (format #f "subvolume=~a"
+		       (basename
+			(btrfs-subvolume-path subvolume))))))
+   (btrfs-partition-subvolumes partition)))

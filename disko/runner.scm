@@ -1,7 +1,10 @@
 (define-module (disko runner)
   #:use-module (disko device)
+  #:use-module (disko partitions vfat)
+  #:use-module (disko partitions btrfs)
   #:use-module (disko partitioning)
   #:use-module (disko file-systems)
+  #:use-module (ice-9 pretty-print)
   #:export (run-disko))
 
 (define (get-partition-start-end partition)
@@ -15,5 +18,8 @@
    (lambda (i device)
      (part-disk (disko-device-file device)
 		(disko-device-partitions device))
-     (make-file-systems device))
-   (iota (length devices)) devices))
+     (make-file-systems device)
+     (newline))
+   (iota (length devices)) devices)
+
+  (pretty-print (devices->file-systems devices)))

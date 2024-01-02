@@ -28,10 +28,6 @@
    (file "/dev/nvme0n1")
    (partitions
     (list
-     (vfat-partition
-      (start (MiB 1))
-      (end (GiB 2))
-      (mount-point "/boot/efi"))
      (btrfs-partition
       (start (GiB 2))
       (end (percentage 100))
@@ -57,7 +53,11 @@
        (list
 	(btrfs-swapfile
 	 (path "/.swapvol/swapfile")
-	 (size (GiB 8)))))))))))
+	 (size (GiB 8))))))
+     (vfat-partition
+      (start (MiB 1))
+      (end (GiB 2))
+      (mount-point "/boot/efi")))))))
 
 ;; Local Variables:
 ;; mode: scheme

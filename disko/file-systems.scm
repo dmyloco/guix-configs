@@ -2,7 +2,9 @@
   #:use-module (disko partitions vfat)
   #:use-module (disko partitions btrfs)
   #:use-module (disko device)
-  #:export (make-file-systems))
+  #:use-module (srfi srfi-1)
+  #:export (make-file-systems
+	    devices->file-systems))
 
 (define (make-fs file partition)
   (cond ((vfat-partition? partition)
@@ -26,3 +28,20 @@
        (make-fs file partition))
      partitions (disko-device-partitions device))
     ))
+
+(define (partitions->file-systems disk partitions)
+  (append-map
+   (lambda (partition)
+     (cond ((vfat-partition? partition)
+	    (vfat-partition->file-systems disk partition))
+	   ((btrfs-partition? partition)
+	    (btrfs-partition->file-systems disk partition))))
+   partitions))
+
+(define (devices->file-systems devices)
+  (append-map
+   (lambda (device)
+     (partitions->file-systems
+      (disko-device-file device)
+      (disko-device-partitions device)))
+   devices))
