@@ -5,6 +5,10 @@
 
 Development in progress. Inspired by nix-community's disko flake
 
+* Why stdout instead of runtime commands running?
+
+I used the standard output to test the commands, and then I was too lazy to rewrite the code afterwards
+
 * Roadmap
 
 1. [ ] Root directory is hardcoded (=/mnt=). Get it from CLI, then put to ENV and take in procedures with =getenv= like =INSTALLATION_ROOT= env variable
