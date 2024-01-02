@@ -3,12 +3,15 @@
 
 * Installation
 
-1. Boot [[Installation Media][installation media]]
+1. Boot [[#installation-media][installation media]]
 2. Clone this repository
 3. Connect to the internet
 4. Run =guix pull --channels=channels.scm --profile=~/.config/guix/current=
 5. Run =./system-install SYSTEM-NAME=
 
-** <<Installation Media>>
+** Installation Media
+:PROPERTIES:
+:CUSTOM_ID: installation-media
+:END:
 
 Nothing
