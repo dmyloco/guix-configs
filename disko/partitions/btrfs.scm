@@ -3,7 +3,8 @@
   #:use-module (disko utils)
   #:export (btrfs-partition
 	    btrfs-partition?
-	    btrfs-partition-size
+	    btrfs-partition-start
+	    btrfs-partition-end
 	    btrfs-partition-mount-point
 	    btrfs-partition-extra-args
 	    btrfs-partition-subvolumes
@@ -24,7 +25,8 @@
   btrfs-partition
   make-btrfs-partition
   btrfs-partition?
-  (size btrfs-partition-size)
+  (start btrfs-partition-start)
+  (end btrfs-partition-end)
   (mount-point btrfs-partition-mount-point)
   (extra-args btrfs-partition-extra-args)
   (subvolumes btrfs-partition-subvolumes)
@@ -36,7 +38,7 @@
   btrfs-subvolume?
   (path btrfs-subvolume-path)
   (mount-point btrfs-subvolume-mount-point)
-  (options btrfs-subvolume-options))
+  (options btrfs-subvolume-options (default '())))
 
 (define-record-type* <btrfs-swapfile>
   btrfs-swapfile

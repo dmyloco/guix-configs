@@ -6,7 +6,11 @@
 (use-modules
  (gnu system)
  (guix monads)
- (disko partitioning))
+ (disko partitions vfat)
+ (disko partitions btrfs)
+ (disko device)
+ (disko utils)
+ (disko runner))
 
 (define (install-operating-system os target)
   (let ((bootloader (operating-system-bootloader os))
@@ -29,7 +33,8 @@
       (end (GiB 2))
       (mount-point "/boot/efi"))
      (btrfs-partition
-      (size (percentage 100))
+      (start (GiB 2))
+      (end (percentage 100))
       (mount-point "/partition-root")
       (extra-args '("-f"))
       (subvolumes
