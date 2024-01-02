@@ -1,0 +1,6 @@
+#+TITLE: Disko for Guix
+#+AUTHOR: Dmitry Klementiev
+
+* Disclaimer
+
+Development in progress. Inspired by nix-community's disko flake

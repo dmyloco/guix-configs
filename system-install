@@ -1,11 +1,12 @@
-#!/usr/bin/env -S GUILE_LOAD_PATH=${HOME}/.config/guix/current/share/guile/site/3.0/:${GUILE_LOAD_PATH} guix repl --
+#!/usr/bin/env -S GUILE_LOAD_PATH=${HOME}/.config/guix/current/share/guile/site/3.0/:${GUILE_LOAD_PATH} guix repl -L ./ --
 !#
 ;; SPDX-License-Identifier: GPL-3.0-or-later
 ;; Copyright © 2023 Dmitry Klementiev
 
 (use-modules
  (gnu system)
- (guix monads))
+ (guix monads)
+ (disko partitioning))
 
 (define (install-operating-system os target)
   (let ((bootloader (operating-system-bootloader os))
@@ -16,6 +17,42 @@
      #:install-bootloader? #t
      #:bootloader bootloader
      #:bootcfg bootcfg)))
+
+(run-disko
+ (list
+  (disko-device
+   (file "/dev/nvme0n1")
+   (partitions
+    (list
+     (vfat-partition
+      (start (MiB 1))
+      (end (GiB 2))
+      (mount-point "/boot/efi"))
+     (btrfs-partition
+      (size (percentage 100))
+      (mount-point "/partition-root")
+      (extra-args '("-f"))
+      (subvolumes
+       (list
+	(btrfs-subvolume
+	 (path "/rootfs")
+	 (mount-point "/"))
+	(btrfs-subvolume
+	 (path "/home")
+	 (mount-point "/home")
+	 (options '("compress=zstd")))
+	(btrfs-subvolume
+	 (path "/gnu")
+	 (mount-point "/gnu")
+	 (options '("compress=zstd" "noatime")))
+	(btrfs-subvolume
+	 (path "/swap")
+	 (mount-point "/.swapvol"))))
+      (swapfiles
+       (list
+	(btrfs-swapfile
+	 (path "/.swapvol/swapfile")
+	 (size (GiB 8)))))))))))
 
 ;; Local Variables:
 ;; mode: scheme
