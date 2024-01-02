@@ -1,6 +1,7 @@
 (define-module (disko partitions btrfs)
   #:use-module (guix records)
   #:use-module (disko utils)
+  #:use-module (ice-9 match)
   #:export (btrfs-partition
 	    btrfs-partition?
 	    btrfs-partition-start
@@ -19,11 +20,13 @@
 	    btrfs-swapfile
 	    btrfs-swapfile?
 	    btrfs-swapfile-path
-	    btrfs-swapfile-size))
+	    btrfs-swapfile-size
+
+	    make-btrfs-partition))
 
 (define-record-type* <btrfs-partition>
   btrfs-partition
-  make-btrfs-partition
+  %btrfs-partition
   btrfs-partition?
   (start btrfs-partition-start)
   (end btrfs-partition-end)
@@ -34,7 +37,7 @@
 
 (define-record-type* <btrfs-subvolume>
   btrfs-subvolume
-  make-btrfs-subvolume
+  %btrfs-subvolume
   btrfs-subvolume?
   (path btrfs-subvolume-path)
   (mount-point btrfs-subvolume-mount-point)
@@ -42,7 +45,39 @@
 
 (define-record-type* <btrfs-swapfile>
   btrfs-swapfile
-  make-btrfs-swapfile
+  %btrfs-swapfile
   btrfs-swapfile
   (path btrfs-swapfile-path)
   (size btrfs-swapfile-size))
+
+(define (make-btrfs-partition file partition)
+  (let* ((start (btrfs-partition-start partition))
+	 (end (btrfs-partition-end partition))
+	 (mount-point (btrfs-partition-mount-point partition))
+	 (partition-mount-point mount-point)
+	 (extra-args (btrfs-partition-extra-args partition))
+	 (subvolumes (btrfs-partition-subvolumes partition))
+	 (swapfiles (btrfs-partition-swapfiles partition)))
+    (display (string-join (append
+			   (list "mkfs.btrfs")
+			   extra-args
+			   (list file))))
+    (newline)
+
+    (display (string-join (list "mkdir" "-p" mount-point)))
+    (newline)
+    (display (string-join (list "mount" file mount-point)))
+    (newline)
+
+    (for-each
+     (match-lambda
+       (($ <btrfs-subvolume> path mount-point options)
+	(begin
+	  (display (string-join (list "btrfs" "subvolume" "create"
+				      (string-append
+				       partition-mount-point path))))
+	  (newline)
+	  )))
+     subvolumes)
+    ;; TODO: Swapfiles
+    ))

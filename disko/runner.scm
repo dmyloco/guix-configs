@@ -1,6 +1,7 @@
 (define-module (disko runner)
   #:use-module (disko device)
   #:use-module (disko partitioning)
+  #:use-module (disko file-systems)
   #:export (run-disko))
 
 (define (get-partition-start-end partition)
@@ -12,9 +13,7 @@
 (define (run-disko devices)
   (for-each
    (lambda (i device)
-     (display (format #f "Setup device: ~a ..."
-		      (disko-device-file device)))
-     (newline)
      (part-disk (disko-device-file device)
-		(disko-device-partitions device)))
+		(disko-device-partitions device))
+     (make-file-systems device))
    (iota (length devices)) devices))
