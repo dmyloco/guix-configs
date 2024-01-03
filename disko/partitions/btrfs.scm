@@ -109,7 +109,11 @@
       (mount-point (btrfs-subvolume-mount-point subvolume))
       (device device)
       (type "btrfs")
-      (options (format #f "subvolume=~a"
+      (options (format #f "subvolume=~a~a"
 		       (basename
-			(btrfs-subvolume-path subvolume))))))
+			(btrfs-subvolume-path subvolume))
+		       (let ((options (string-join
+				       (btrfs-subvolume-options subvolume) ",")))
+			 (if (not (null? (btrfs-subvolume-options subvolume)))
+			     (string-append "," options) ""))))))
    (btrfs-partition-subvolumes partition)))

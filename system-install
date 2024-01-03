@@ -22,42 +22,43 @@
      #:bootloader bootloader
      #:bootcfg bootcfg)))
 
-(run-disko
- (list
-  (disko-device
-   (file "/dev/nvme51qn23")
-   (partitions
-    (list
-     (btrfs-partition
-      (start (GiB 2))
-      (end (percentage 100))
-      (mount-point "/partition-root")
-      (extra-args '("-f"))
-      (subvolumes
-       (list
-	(btrfs-subvolume
-	 (path "/rootfs")
-	 (mount-point "/"))
-	(btrfs-subvolume
-	 (path "/home")
-	 (mount-point "/home")
-	 (options '("compress=zstd")))
-	(btrfs-subvolume
-	 (path "/gnu")
-	 (mount-point "/gnu")
-	 (options '("compress=zstd" "noatime")))
-	(btrfs-subvolume
-	 (path "/swap")
-	 (mount-point "/.swapvol"))))
-      (swapfiles
-       (list
-	(btrfs-swapfile
-	 (path "/.swapvol/swapfile")
-	 (size (GiB 8))))))
-     (vfat-partition
-      (start (MiB 1))
-      (end (GiB 2))
-      (mount-point "/boot/efi")))))))
+(when (getenv "GUIX_DISKO_ENABLE")
+  (run-disko
+   (list
+    (disko-device
+     (file "/dev/nvme51qn23")
+     (partitions
+      (list
+       (btrfs-partition
+	(start (GiB 2))
+	(end (percentage 100))
+	(mount-point "/partition-root")
+	(extra-args '("-f"))
+	(subvolumes
+	 (list
+	  (btrfs-subvolume
+	   (path "/rootfs")
+	   (mount-point "/"))
+	  (btrfs-subvolume
+	   (path "/home")
+	   (mount-point "/home")
+	   (options '("compress=zstd")))
+	  (btrfs-subvolume
+	   (path "/gnu")
+	   (mount-point "/gnu")
+	   (options '("compress=zstd" "noatime")))
+	  (btrfs-subvolume
+	   (path "/swap")
+	   (mount-point "/.swapvol"))))
+	(swapfiles
+	 (list
+	  (btrfs-swapfile
+	   (path "/.swapvol/swapfile")
+	   (size (GiB 8))))))
+       (vfat-partition
+	(start (MiB 1))
+	(end (GiB 2))
+	(mount-point "/boot/efi"))))))))
 
 ;; Local Variables:
 ;; mode: scheme
