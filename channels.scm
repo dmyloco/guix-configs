@@ -9,7 +9,7 @@
  (channel
   (name 'nonguix)
   (url "https://gitlab.com/nonguix/nonguix")
-  (branch "main"))
+  (branch "master"))
  (channel
   (name 'rde)
   (url "https://git.sr.ht/~abcdw/rde")
