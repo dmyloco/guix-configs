@@ -52,6 +52,16 @@
   (path btrfs-swapfile-path)
   (size btrfs-swapfile-size))
 
+(define (->btrfs-size size)
+  (cond ((string-suffix? "GiB" size)
+	 ;; Remove "iB" at the and. Keep only "G"
+	 (substring size 0 (- (length size) 2)))
+	((string-suffix? "MiB" size)
+	 ;; Remove "iB" at the and. Keep only "M"
+	 (substring size 0 (- (length size) 2)))
+	(else
+	 (error (format #f "`->btrfs-size' failed: ~a" size)))))
+
 (define (make-btrfs-partition file partition)
   (let* ((start (btrfs-partition-start partition))
 	 (end (btrfs-partition-end partition))
@@ -92,7 +102,7 @@
     (for-each
      (lambda (swapfile)
        (display (string-join (list "btrfs" "filesystem" "mkswapfile"
-				   "--size" (btrfs-swapfile-size swapfile)
+				   "--size" (->btrfs-size (btrfs-swapfile-size swapfile))
 				   (string-append "/mnt"
 						  (btrfs-swapfile-path swapfile)))))
        (newline))
